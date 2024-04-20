@@ -1,0 +1,42 @@
+image2D=[0 1 5 4 8 7 ;  4 2 9 8 5 1 ;  5 2 4 6 2 1 ;  1 2 5 4 3 6 ;  2 5 4 1 2 5 ;  0 3 2 1 0 5 ];
+
+image2DTF=TFD2D(image2D);
+image2DTFI=TIFD2D(image2DTF);
+disp(image2D);
+%disp(image2DTF);
+disp(image2DTFI);
+
+%fonction transformee de fourier directe 2D
+function[image] = TFD2D(image2D)
+[M,N] = size(image2D);
+image=zeros(M, N);
+for u=1:N
+    for v=1:M
+        for x=1:N
+            for y=1:M
+                image(u,v) = image(u,v) + image2D(x,y)*exp((-2*1i*pi*(((u*x)/N)+((v*y)/M))));
+            end
+        end
+    end   
+end
+
+
+end
+
+% fonction transformee de fourier inverse directe 2D
+  
+function[image] = TIFD2D(image2D)
+[M,N] = size(image2D);
+image=zeros(M, N);
+for u=1:N
+    for v=1:M
+        for x=1:N
+            for y=1:M
+                image(u,v) = image(u,v) + image2D(x,y)*exp((2*1i*pi*(((u*x)/N)+((v*y)/M))));
+            end
+        end
+     image(u,v) = image(u,v)/(N*M/100);
+    end   
+end
+
+end

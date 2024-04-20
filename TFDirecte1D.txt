@@ -1,0 +1,33 @@
+image1D=[0 1 3 2 1 0 5 0];
+
+
+
+image1DTF=TFD1D(image1D);
+image1DTFI=TIFD1D(image1DTF);
+disp(image1D);
+disp(image1DTF);
+disp(image1DTFI);
+
+% fonction de TF directe 1D
+
+function[image1DTF] = TFD1D(image1D)
+[M,N] = size(image1D);
+image1DTF=zeros(1, N);
+for u=1:N
+    for x=1:N
+        image1DTF(u) = image1DTF(u) + image1D(x)*exp((-2*1i*pi*u*x)/N);
+    end
+end
+end
+
+%fonction de transformee de fourier inverse directe 1D
+function[image1DTF] = TIFD1D(image1D)
+[M,N] = size(image1D);
+image1DTF=zeros(1, N);
+for u=1:N
+    for x=1:N
+        image1DTF(u) = image1DTF(u) + image1D(x)*exp((2*1i*pi*u*x)/N);
+    end
+    image1DTF(u)=image1DTF(u)/N;
+end
+end     

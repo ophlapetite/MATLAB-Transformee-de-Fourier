@@ -1,0 +1,155 @@
+image1D=[0 1 3 2 1 0 5 0];
+
+image2D=[0 1 5 4  ;  4 2 9 8  ;  5 2 4 6  ;  1 2 5 4 ];
+
+%disp(image1D);
+%image2=TFR1D(image1D);
+%disp(image2);
+%image3=TFR1DInv(image2);
+%[M,N] = size(image3);
+%image3=image3/N;
+%disp(image3);
+image2DTF=TFR2D(image2D);
+image2DTFI=TFR2DInv(image2DTF);
+disp(image2D);
+disp(image2DTF);
+image3=image2DTFI;
+[M,N] = size(image3);
+image3=image3/N;
+disp(image3);
+%image3=fft2(image2D);
+%disp(image3);
+
+
+
+function[image] =TFR1D(image1D)
+[M,N] = size(image1D);
+image=zeros(1, N);
+
+if N==1
+   image(1)=image1D(1);
+else
+    
+Pair = zeros(1, floor(N / 2));
+Impair = zeros(1,floor( N / 2));
+for u = 1 : N
+ if mod(u, 2) == 0 
+ Pair(u / 2) = image1D(u);
+ else
+ Impair( ( u + 1 ) / 2 ) = image1D(u);
+ end
+end
+
+FTPair=TFR1D(Pair);
+FTImpair=TFR1D(Impair);
+for u=1:N/2
+    coef = exp( (- 2 * i * pi * u ) / N );
+    image(u)=FTPair(u)+(coef * FTImpair(u));
+    image(floor((N/2)+u))=FTPair(u)-(coef* FTImpair(u));
+end
+end
+end
+
+function[image] =TFR1DInv(image1D)
+[M,N] = size(image1D);
+image=zeros(1, N);
+if N==1
+   image(1)=image1D(1);
+else
+    
+Pair = zeros(1, floor(N / 2));
+Impair = zeros(1, floor(N / 2));
+for u = 1 : N
+ if mod(u, 2) == 0 
+ Pair(u / 2) = image1D(u);
+ else
+ Impair( ( u + 1 ) / 2 ) = image1D(u);
+ end
+end
+
+FTPair=TFR1DInv(Pair);
+FTImpair=TFR1DInv(Impair);
+for u=1:N/2
+    coef = exp( ( 2 * i * pi * u ) / N );
+    image(u)=FTPair(u)+(coef * FTImpair(u));
+    image(floor((N/2)+u))=FTPair(u)-(coef* FTImpair(u));
+end
+end
+end
+
+
+function[image] =TFR2D(image2D)
+[M,N] = size(image2D);
+image=zeros(M, N);
+% Matrice à une ligne de la taille d'une ligne de l'image
+ligne = zeros(1, N);
+% On traite chaque ligne de l'image
+for l = 1 : M    
+%On recopie la ligne courante dans la matrice de travail
+    for c = 1 : N        
+        ligne(c) = image2D(l, c);
+        
+    end
+    
+    %On applique la transformée de Fourier 1D sur la lignecourante  
+    
+    ligne = TFR1D(ligne);
+    % On recopie la ligne de travail, résultat de latransformée, dans l'image résultat
+    for c = 1 : N        
+    image(l, c) = ligne(c);
+    end
+end
+% Matrice à une ligne de la taille d'une colonne de l'image
+colonne = zeros(1, M);
+% On traite chaque colonne de l'image
+for c = 1 : N    
+    %On recopie la colonne courante dans la matrice de travail
+    for l = 1 : M        
+    colonne(l,1) = image2D(l, c);
+    end
+    % On applique la transformée de Fourier 1D sur la colonnecourante    
+    colonne = TFR1D(colonne);  
+    %On recopie la colonne de travail, résultat de latransformée, dans l'image résultat
+    for l = 1 : M        
+    image(l, c) = colonne(l);
+    end
+end
+end
+
+function[image] =TFR2DInv(image2D)
+[M,N] = size(image2D);
+image=zeros(M, N);
+% Matrice à une ligne de la taille d'une ligne de l'image
+ligne = zeros(1, N);
+% On traite chaque ligne de l'image
+for l = 1 : M    
+%On recopie la ligne courante dans la matrice de travail
+    for c = 1 : N        
+        ligne(1,c) = image2D(l, c);
+    end
+    %On applique la transformée de Fourier 1D sur la lignecourante  
+    ligne = TFR1DInv(ligne);
+    
+    % On recopie la ligne de travail, résultat de latransformée, dans l'image résultat
+    for c = 1 : M        
+    image(l, c) = ligne(1,c);
+    end
+end
+% Matrice à une ligne de la taille d'une colonne de l'image
+colonne = zeros(1, M);
+% On traite chaque colonne de l'image
+for c = 1 : N    
+    %On recopie la colonne courante dans la matrice de travail
+    for l = 1 : M        
+    colonne(l,1) = image2D(l, c);
+    end
+    
+    % On applique la transformée de Fourier 1D sur la colonnecourante    
+    colonne = TFR1DInv(colonne);  
+    
+    %On recopie la colonne de travail, résultat de latransformée, dans l'image résultat
+    for l = 1 : M        
+    image(l, c) = colonne(1,l);
+    end
+end
+end
